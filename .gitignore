@@ -1,1 +1,19 @@
-﻿__pycache__/\n*.db\n*.pyc
+# Archivos compilados y cache de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Bases de datos locales
+*.db
+*.sqlite3
+
+# Entornos virtuales
+venv/
+env/
+.venv/
+
+# Configuraciones temporales de VS Code y editores
+.vscode/
+.idea/
+*.log
