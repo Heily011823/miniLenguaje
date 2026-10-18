@@ -1,0 +1,17 @@
+# Programa 2: Suma de tiempo de entregas en arreglos
+tarea calcular_tiempo(paquetes, n):
+    cargar total en 0;
+    recorrer i desde 0 hasta n - 1:
+        total en total + paquetes[i];
+    fin_ruta
+    entregar total;
+fin_ruta
+
+cargar envios en [4, 8, 15, 16];
+cargar resultado en calcular_tiempo(envios, 4);
+
+evaluar resultado > 40 y resultado < 50:
+    notificar("El tiempo total de ruta es " + resultado);
+alternativa:
+    notificar("Ruta fuera del tiempo limite");
+fin_ruta

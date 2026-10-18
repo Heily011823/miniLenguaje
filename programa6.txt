@@ -1,0 +1,12 @@
+# Programa 6: Errores sintacticos
+cargar total en 10
+notificar("Total: " + total);
+
+evaluar total > 5
+    notificar("Mayor que cinco");
+fin_ruta
+
+patrullar total > 0:
+    total en total - 1;
+
+notificar("Fin");
