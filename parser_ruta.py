@@ -1,4 +1,4 @@
-"""Analizador sintáctico (descenso recursivo) de Ruta.
+"""Analizador sintáctico (descenso recursivo) de Tramo.
 
 Implementa la gramática EBNF y construye el AST.
 Se detiene en el primer error sintáctico y lo reporta con su línea.

@@ -1,4 +1,4 @@
-"""Intérprete de Ruta: recorre el AST y ejecuta el programa."""
+"""Intérprete de Tramo: recorre el AST y ejecuta el programa."""
 import sqlite3
 
 from nodos import *
@@ -6,7 +6,7 @@ from nodos import *
 
 # ---------- errores y señales de control ----------
 class ExcepcionRuta(Exception):
-    """Excepción lanzada con 'alerta' desde un programa Ruta."""
+    """Excepción lanzada con 'alerta' desde un programa Tramo."""
     def __init__(self, valor, linea):
         super().__init__(str(valor))
         self.valor = valor

@@ -1,4 +1,4 @@
-"""Ruta: analizador léxico, sintáctico, semántico e intérprete.
+"""Tramo: analizador léxico, sintáctico, semántico e intérprete.
 
 Uso:  python main.py programa1.txt
       python main.py programa1.txt --sin-tokens      (oculta la lista de tokens)

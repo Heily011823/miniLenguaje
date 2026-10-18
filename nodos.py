@@ -1,4 +1,4 @@
-"""Nodos del árbol sintáctico (AST) de Ruta."""
+"""Nodos del árbol sintáctico (AST) de Tramo."""
 from dataclasses import dataclass
 from typing import Any, List, Optional, Tuple
 

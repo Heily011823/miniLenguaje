@@ -1,4 +1,4 @@
-"""Interfaz gráfica de Ruta: editor + paneles de tokens, errores y salida.
+"""Interfaz gráfica de Tramo: editor + paneles de tokens, errores y salida.
 
 Uso:  python main.py --gui      (o   python gui.py)
 """
@@ -32,7 +32,7 @@ class App:
     def __init__(self, raiz):
         self.raiz = raiz
         self.archivo = None
-        raiz.title("Ruta — editor e intérprete")
+        raiz.title("Tramo — editor e intérprete")
         raiz.geometry("1200x720")
         self.semantico = tk.BooleanVar(value=True)
         self.ver_tokens = tk.BooleanVar(value=True)
@@ -61,7 +61,7 @@ class App:
         panel.pack(fill=tk.BOTH, expand=True)
 
         # --- izquierda: editor con números de línea
-        izq = ttk.Labelframe(panel, text="Programa (Ruta)")
+        izq = ttk.Labelframe(panel, text="Programa (Tramo)")
         panel.add(izq, weight=3)
         cont = ttk.Frame(izq)
         cont.pack(fill=tk.BOTH, expand=True)
@@ -133,8 +133,8 @@ class App:
         self.editor.tag_remove("linea_error", "1.0", "end")
 
     def abrir(self):
-        ruta = filedialog.askopenfilename(title="Abrir programa Ruta",
-                                          filetypes=[("Programas Ruta", "*.txt *.ruta"), ("Todos", "*.*")])
+        ruta = filedialog.askopenfilename(title="Abrir programa Tramo",
+                                          filetypes=[("Programas Tramo", "*.txt *.tramo"), ("Todos", "*.*")])
         if not ruta:
             return
         try:
@@ -151,11 +151,11 @@ class App:
         self.editor.insert("1.0", contenido)
         self.actualizar_numeros()
         self.limpiar()
-        self.raiz.title("Ruta — %s" % (ruta or "sin título"))
+        self.raiz.title("Tramo — %s" % (ruta or "sin título"))
 
     def guardar(self):
         ruta = self.archivo or filedialog.asksaveasfilename(
-            defaultextension=".txt", filetypes=[("Programas Ruta", "*.txt"), ("Todos", "*.*")])
+            defaultextension=".txt", filetypes=[("Programas Tramo", "*.txt"), ("Todos", "*.*")])
         if not ruta:
             return
         try:
@@ -165,7 +165,7 @@ class App:
             messagebox.showerror("Error", "No se pudo guardar: %s" % e.strerror)
             return
         self.archivo = ruta
-        self.raiz.title("Ruta — %s" % ruta)
+        self.raiz.title("Tramo — %s" % ruta)
         self.estado.configure(text="Guardado")
 
     # ------------------------------------------------------ ejecución

@@ -1,4 +1,4 @@
-"""Núcleo de Ruta: ejecuta las cuatro etapas (léxico, sintáctico, semántico, ejecución).
+"""Núcleo de Tramo: ejecuta las cuatro etapas (léxico, sintáctico, semántico, ejecución).
 
 Lo usan tanto la línea de comandos (main.py) como la interfaz gráfica (gui.py).
 La función correr() no imprime nada por sí misma: informa mediante callbacks.
@@ -36,7 +36,7 @@ def correr(codigo, entrada, salida, reportar, mostrar_tokens=True, semantico=Tru
         reportar("error", "Error sintáctico en la línea %d: %s" % (e.linea, e.mensaje))
         return 1
     reportar("fase", "ANÁLISIS SINTÁCTICO")
-    reportar("info", "El programa cumple la gramática de Ruta.")
+    reportar("info", "El programa cumple la gramática de Tramo.")
 
     # 3) Análisis semántico
     if semantico:

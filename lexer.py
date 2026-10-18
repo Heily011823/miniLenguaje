@@ -1,4 +1,4 @@
-"""Analizador léxico del lenguaje Ruta.
+"""Analizador léxico del lenguaje Tramo.
 
 Convierte el texto del programa en una lista de tokens. Cada token guarda su
 tipo, su lexema y la línea donde aparece. Los errores léxicos (símbolos
