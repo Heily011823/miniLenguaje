@@ -12,7 +12,7 @@ class Nodo:
 @dataclass
 class Declarar(Nodo):
     nombre: str
-    valor: Any
+    valor: Any            # None si se declara sin valor inicial
 
 @dataclass
 class Asignar(Nodo):
@@ -25,7 +25,7 @@ class Imprimir(Nodo):
 
 @dataclass
 class Leer(Nodo):
-    nombre: str
+    destino: Any          # Var, Atributo o Indice
 
 @dataclass
 class Si(Nodo):
@@ -38,11 +38,22 @@ class Mientras(Nodo):
     cuerpo: list
 
 @dataclass
+class Rondar(Nodo):                   # do-while
+    cuerpo: list
+    cond: Any
+
+@dataclass
 class Para(Nodo):
     var: str
     desde: Any
     hasta: Any
     cuerpo: list
+
+@dataclass
+class Bifurcar(Nodo):                 # switch
+    expr: Any
+    casos: List[Tuple[Any, list]]
+    defecto: Optional[list] = None
 
 @dataclass
 class Funcion(Nodo):
@@ -57,15 +68,17 @@ class Retorno(Nodo):
 @dataclass
 class Clase(Nodo):
     nombre: str
-    params_ctor: List[str]
+    padre: Optional[str]
+    params_ctor: Optional[List[str]]  # None si no declara 'ensamblar'
     cuerpo_ctor: list
     metodos: List[Funcion]
+    campos: List[Declarar]            # atributos con valor por defecto
 
 @dataclass
 class Intentar(Nodo):
     cuerpo: list
-    var_error: str
-    capturar: list
+    var_error: Optional[str]
+    capturar: Optional[list]
     final: Optional[list] = None
 
 @dataclass
@@ -138,3 +151,8 @@ class Nuevo(Nodo):
 @dataclass
 class Mismo(Nodo):
     pass
+
+@dataclass
+class Super(Nodo):                    # superior.metodo(args) / superior.ensamblar(args)
+    metodo: str
+    args: list

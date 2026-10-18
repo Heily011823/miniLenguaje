@@ -1,9 +1,26 @@
 """Analizador sintáctico (descenso recursivo) de Ruta.
 
-Implementa la gramática EBNF de la sección 6 y construye el AST.
+Implementa la gramática EBNF y construye el AST.
 Se detiene en el primer error sintáctico y lo reporta con su línea.
 """
 from nodos import *
+
+ESCAPES = {"n": "\n", "t": "\t", "r": "\r", '"': '"', "\\": "\\"}
+
+
+def desescapar(texto):
+    """Convierte \\n, \\t, \\" y \\\\ dentro de una cadena."""
+    salida, i = [], 0
+    while i < len(texto):
+        c = texto[i]
+        if c == "\\" and i + 1 < len(texto):
+            sig = texto[i + 1]
+            salida.append(ESCAPES.get(sig, "\\" + sig))
+            i += 2
+        else:
+            salida.append(c)
+            i += 1
+    return "".join(salida)
 
 
 class ErrorSintactico(Exception):
@@ -18,10 +35,12 @@ class Parser:
         "KW_CARGAR": "declaracion", "KW_NOTIFICAR": "impresion",
         "KW_ESCANEAR": "lectura", "KW_EVALUAR": "condicional",
         "KW_PATRULLAR": "ciclo_mientras", "KW_RECORRER": "ciclo_para",
+        "KW_RONDAR": "ciclo_rondar", "KW_BIFURCAR": "bifurcar",
         "KW_TAREA": "funcion", "KW_ENTREGAR": "retorno",
         "KW_MODULO": "clase", "KW_INTENTAR_RUTA": "excepcion",
         "KW_ALERTA": "lanzar", "KW_DETENER": "sentencia_detener", "KW_AVANZAR": "sentencia_avanzar",
     }
+    INICIO_EXPRESION_SENTENCIA = ("ID", "KW_MISMO", "KW_SUPERIOR", "KW_DESPLEGAR")
 
     def __init__(self, tokens):
         self.tokens = tokens
@@ -74,7 +93,7 @@ class Parser:
         metodo = self.DESPACHO.get(tipo)
         if metodo:
             return getattr(self, metodo)()
-        if tipo in ("ID", "KW_MISMO"):
+        if tipo in self.INICIO_EXPRESION_SENTENCIA:
             return self.asignacion_o_llamada()
         raise ErrorSintactico(self.actual.linea,
                               "no se esperaba '%s' en este lugar" % self.actual.lexema)
@@ -82,8 +101,13 @@ class Parser:
     def declaracion(self):
         tok = self.consumir()
         nombre = self.esperar("ID", "un nombre de variable")
-        self.esperar("KW_EN", "'en'")
-        valor = self.expresion()
+        valor = None
+        if self.es("KW_EN"):
+            self.consumir()
+            valor = self.expresion()
+        else:
+            if not self.es("PUNTO_COMA"):
+                self.error("'en' o ';'")
         self.esperar("PUNTO_COMA", "';'")
         return Declarar(tok.linea, nombre.lexema, valor)
 
@@ -98,7 +122,7 @@ class Parser:
             valor = self.expresion()
             self.esperar("PUNTO_COMA", "';'")
             return Asignar(inicio.linea, nodo, valor)
-        if not isinstance(nodo, (Llamada, LlamadaMetodo)):
+        if not isinstance(nodo, (Llamada, LlamadaMetodo, Super, Nuevo)):
             self.error("'en' o una llamada a función")
         self.esperar("PUNTO_COMA", "';'")
         return ExprSentencia(inicio.linea, nodo)
@@ -114,10 +138,14 @@ class Parser:
     def lectura(self):
         tok = self.consumir()
         self.esperar("PAREN_IZQ", "'('")
-        nombre = self.esperar("ID", "un nombre de variable")
+        inicio = self.actual
+        destino = self.primario()
+        if not isinstance(destino, (Var, Atributo, Indice)):
+            raise ErrorSintactico(inicio.linea, "'escanear' necesita una variable, un elemento "
+                                  "de lista o un atributo")
         self.esperar("PAREN_DER", "')'")
         self.esperar("PUNTO_COMA", "';'")
-        return Leer(tok.linea, nombre.lexema)
+        return Leer(tok.linea, destino)
 
     def condicional(self):
         tok = self.consumir()
@@ -146,17 +174,44 @@ class Parser:
         self.esperar("KW_FIN_RUTA", "'fin_ruta'")
         return Mientras(tok.linea, cond, cuerpo)
 
+    def ciclo_rondar(self):
+        tok = self.consumir()
+        self.esperar("DOS_PUNTOS", "':'")
+        cuerpo = self.bloque(("KW_REPETIR_SI",), "'repetir_si'")
+        self.esperar("KW_REPETIR_SI", "'repetir_si'")
+        cond = self.expresion()
+        self.esperar("PUNTO_COMA", "';'")
+        return Rondar(tok.linea, cuerpo, cond)
+
     def ciclo_para(self):
         tok = self.consumir()
         var = self.esperar("ID", "el nombre de la variable del ciclo")
-        self.esperar("KW_DESDE", "'desde'")
+        self.esperar("KW_PARTIENDO_DE", "'partiendo_de'")
         desde = self.expresion()
-        self.esperar("KW_HASTA", "'hasta'")
+        self.esperar("KW_LLEGANDO_A", "'llegando_a'")
         hasta = self.expresion()
         self.esperar("DOS_PUNTOS", "':'")
         cuerpo = self.bloque(("KW_FIN_RUTA",))
         self.esperar("KW_FIN_RUTA", "'fin_ruta'")
         return Para(tok.linea, var.lexema, desde, hasta, cuerpo)
+
+    def bifurcar(self):
+        tok = self.consumir()
+        expr = self.expresion()
+        self.esperar("DOS_PUNTOS", "':'")
+        fin_caso = ("KW_PUNTO_RUTA", "KW_RUTA_BASE", "KW_FIN_RUTA")
+        casos, defecto = [], None
+        while self.es("KW_PUNTO_RUTA"):
+            self.consumir()
+            valor = self.expresion()
+            self.esperar("DOS_PUNTOS", "':'")
+            casos.append((valor, self.bloque(fin_caso)))
+        if self.es("KW_RUTA_BASE"):
+            self.consumir()
+            self.esperar("DOS_PUNTOS", "':'")
+            defecto = self.bloque(("KW_FIN_RUTA",))
+        self.esperar("KW_FIN_RUTA", "'punto_ruta', 'ruta_base' o 'fin_ruta'")
+        return Bifurcar(tok.linea, expr, casos, defecto)
 
     def parametros(self):
         params = []
@@ -187,35 +242,53 @@ class Parser:
     def clase(self):
         tok = self.consumir()
         nombre = self.esperar("ID", "el nombre del módulo")
+        padre = None
+        if self.es("KW_EXTIENDE"):
+            self.consumir()
+            padre = self.esperar("ID", "el nombre del módulo padre").lexema
         self.esperar("DOS_PUNTOS", "':'")
-        self.esperar("KW_ENSAMBLAR", "'ensamblar'")
-        self.esperar("PAREN_IZQ", "'('")
-        params = self.parametros()
-        self.esperar("PAREN_DER", "')'")
-        self.esperar("DOS_PUNTOS", "':'")
-        cuerpo = self.bloque(("KW_FIN_RUTA",))
+        params, cuerpo, metodos, campos = None, [], [], []
+        while not self.es("KW_FIN_RUTA"):
+            if self.es("EOF"):
+                self.error("'fin_ruta'")
+            if self.es("KW_ENSAMBLAR"):
+                if params is not None:
+                    raise ErrorSintactico(self.actual.linea, "el módulo ya tiene un 'ensamblar'")
+                self.consumir()
+                self.esperar("PAREN_IZQ", "'('")
+                params = self.parametros()
+                self.esperar("PAREN_DER", "')'")
+                self.esperar("DOS_PUNTOS", "':'")
+                cuerpo = self.bloque(("KW_FIN_RUTA",))
+                self.esperar("KW_FIN_RUTA", "'fin_ruta'")
+            elif self.es("KW_TAREA"):
+                metodos.append(self.funcion())
+            elif self.es("KW_CARGAR"):
+                campos.append(self.declaracion())
+            else:
+                self.error("'ensamblar', 'tarea', 'cargar' o 'fin_ruta'")
         self.esperar("KW_FIN_RUTA", "'fin_ruta'")
-        metodos = []
-        while self.es("KW_TAREA"):
-            metodos.append(self.funcion())
-        self.esperar("KW_FIN_RUTA", "'fin_ruta'")
-        return Clase(tok.linea, nombre.lexema, params, cuerpo, metodos)
+        return Clase(tok.linea, nombre.lexema, padre, params, cuerpo, metodos, campos)
 
     def excepcion(self):
         tok = self.consumir()
         self.esperar("DOS_PUNTOS", "':'")
-        cuerpo = self.bloque(("KW_OBSTACULO",), "'obstaculo'")
-        self.esperar("KW_OBSTACULO", "'obstaculo'")
-        var = self.esperar("ID", "un nombre para el error")
-        self.esperar("DOS_PUNTOS", "':'")
-        capturar = self.bloque(("KW_DESTINO", "KW_FIN_RUTA"))
-        final = None
+        cuerpo = self.bloque(("KW_OBSTACULO", "KW_DESTINO", "KW_FIN_RUTA"), "'obstaculo'")
+        var, capturar, final = None, None, None
+        if self.es("KW_OBSTACULO"):
+            self.consumir()
+            if self.es("ID"):
+                var = self.consumir().lexema
+            self.esperar("DOS_PUNTOS", "':'")
+            capturar = self.bloque(("KW_DESTINO", "KW_FIN_RUTA"))
         if self.es("KW_DESTINO"):
             self.consumir()
             self.esperar("DOS_PUNTOS", "':'")
             final = self.bloque(("KW_FIN_RUTA",))
+        if capturar is None and final is None:
+            self.error("'obstaculo' o 'destino'")
         self.esperar("KW_FIN_RUTA", "'fin_ruta'")
-        return Intentar(tok.linea, cuerpo, var.lexema, capturar, final)
+        return Intentar(tok.linea, cuerpo, var, capturar, final)
 
     def lanzar(self):
         tok = self.consumir()
@@ -330,13 +403,24 @@ class Parser:
             return Literal(tok.linea, float(tok.lexema))
         if t == "STRING":
             self.consumir()
-            return Literal(tok.linea, tok.lexema[1:-1])
+            return Literal(tok.linea, desescapar(tok.lexema[1:-1]))
         if t == "BOOLEAN":
             self.consumir()
             return Literal(tok.linea, tok.lexema == "verdadero")
+        if t == "KW_NULO":
+            self.consumir()
+            return Literal(tok.linea, None)
         if t == "KW_MISMO":
             self.consumir()
             return Mismo(tok.linea)
+        if t == "KW_SUPERIOR":
+            self.consumir()
+            self.esperar("PUNTO", "'.'")
+            if self.es("ID", "KW_ENSAMBLAR"):
+                nombre = self.consumir().lexema
+            else:
+                self.error("un nombre de método")
+            return Super(tok.linea, nombre, self.argumentos())
         if t == "PAREN_IZQ":
             self.consumir()
             e = self.expresion()
