@@ -3,9 +3,17 @@
 Lo usan tanto la línea de comandos (main.py) como la interfaz gráfica (gui.py).
 La función correr() no imprime nada por sí misma: informa mediante callbacks.
 """
+# Importa la función que realiza el análisis léxico y genera los tokens.
 from lexer import analizar
+
+# Importa el analizador sintáctico y la excepción para gestionar errores de sintaxis.
 from parser_ruta import Parser, ErrorSintactico
+
+# Importa la función que realiza el análisis semántico del programa.
 from semantico import analizar_semantica
+
+# Importa el intérprete para ejecutar el programa y las excepciones
+# utilizadas.
 from interprete import Interprete, ErrorEjecucion, ExcepcionRuta
 
 
