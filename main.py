@@ -6,14 +6,27 @@ Uso:  python main.py programa1.txt
       python main.py --historial                     (muestra las últimas ejecuciones)
       python main.py --gui                           (abre el editor gráfico)
 """
+
+# Permite acceder a los argumentos y configurar la ejecución de Python.
 import sys
+
+# Permite ejecutar el intérprete en un hilo con una pila más grande.
 import threading
 
+# Permite guardar y consultar las ejecuciones anteriores.
 import historial
+
+# Importa la función que ejecuta los programas.
 from nucleo import correr
 
 
 def reportar(canal, texto):
+    """ Muestra los mensajes generados durante el análisis y la ejecución.
+
+    Parámetros:
+        canal: tipo de mensaje que se va a mostrar.
+        texto: contenido del mensaje.
+    """
     if canal == "fase":
         print("=== %s ===" % texto)
     else:
@@ -21,6 +34,11 @@ def reportar(canal, texto):
 
 
 def mostrar_historial():
+    """ Muestra las últimas ejecuciones guardadas en la base de datos.
+
+    Retorna:
+        0 si el historial se muestra correctamente.
+    """
     filas = historial.listar(20)
     if not filas:
         print("El historial está vacío.")
@@ -32,6 +50,15 @@ def mostrar_historial():
 
 
 def main(argv):
+    """ Controla la ejecución principal del intérprete.
+
+    Parámetros:
+        argv: lista de argumentos recibidos desde la terminal.
+
+    Retorna:
+        Un código numérico que indica si la ejecución terminó correctamente.
+        Devuelve 0 si no hubo errores y un valor distinto de 0 si hubo problemas.
+    """
     if "--gui" in argv:
         import gui
         gui.abrir()
@@ -52,6 +79,7 @@ def main(argv):
 
     lineas_salida = []
 
+    # Muestra la salida y la conserva para guardarla en el historial.
     def salida(texto):
         lineas_salida.append(texto)
         print(texto)
@@ -71,7 +99,17 @@ def main(argv):
 
 
 def ejecutar_con_pila_grande(argv):
-    """Corre main() en un hilo con pila grande para que la recursión profunda no falle."""
+    """ Ejecuta main() en un hilo con una pila de mayor tamaño.
+
+    Esto permite ejecutar programas con recursión profunda y reduce
+    la posibilidad de que se agote la pila disponible.
+
+    Parámetros:
+        argv: lista de argumentos recibidos desde la terminal.
+
+    Retorna:
+        El código de salida que devuelve main().
+    """
     sys.setrecursionlimit(1000000)
     resultado = [1]
     try:
@@ -83,6 +121,7 @@ def ejecutar_con_pila_grande(argv):
             resultado[0] = main(argv)
             return resultado[0]
 
+    # Función que ejecuta main() dentro del hilo.
     def tarea():
         resultado[0] = main(argv)
     hilo = threading.Thread(target=tarea)
@@ -95,7 +134,7 @@ def ejecutar_con_pila_grande(argv):
     hilo.join()
     return resultado[0]
 
-
+# Comprueba si el archivo se está ejecutando directamente.
 if __name__ == "__main__":
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
