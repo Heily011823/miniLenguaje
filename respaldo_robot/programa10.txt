@@ -1,0 +1,44 @@
+# Programa 10: Listas (declarar, leer, modificar, anidar) y ciclos con detener/avanzar
+cargar nums en [5, 3, 8, 1];
+notificar(nums[0] + nums[3]);
+nums[1] en 100;
+notificar(nums);
+agregar(nums, 77);
+notificar(longitud(nums));
+cargar mat en [[1, 2], [3, 4]];
+mat[1][0] en 30;
+notificar(mat[1][0] + mat[0][1]);
+cargar vacia en [];
+notificar(longitud(vacia));
+notificar(quitar(nums, 0));
+notificar(nums);
+
+# suma de pares con avanzar y detener (se corta al llegar a un valor mayor que 100)
+cargar valores en [2, 3, 4, 5, 6, 200, 8];
+cargar suma en 0;
+recorrer i partiendo_de 0 llegando_a longitud(valores) - 1:
+  evaluar valores[i] % 2 == 1:
+    avanzar;
+  fin_ruta
+  evaluar valores[i] > 100:
+    detener;
+  fin_ruta
+  suma en suma + valores[i];
+fin_ruta
+notificar("Suma de pares antes del tope: " + suma);
+
+# ciclo condicional
+cargar k en 10;
+patrullar k > 0:
+  k en k - 3;
+fin_ruta
+notificar(k);
+
+# for anidado
+recorrer a partiendo_de 1 llegando_a 3:
+  recorrer b partiendo_de 1 llegando_a 3:
+    evaluar a == b:
+      notificar("diag " + a);
+    fin_ruta
+  fin_ruta
+fin_ruta

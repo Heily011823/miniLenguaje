@@ -6,7 +6,7 @@ from nodos import *
 
 # ---------- errores y señales de control ----------
 class ExcepcionRuta(Exception):
-    """Excepción lanzada con 'alerta' desde un programa Tramo."""
+    """Excepción lanzada con 'tormenta' desde un programa Tramo."""
     def __init__(self, valor, linea):
         super().__init__(str(valor))
         self.valor = valor
@@ -15,7 +15,7 @@ class ExcepcionRuta(Exception):
 
 class ErrorEjecucion(ExcepcionRuta):
     """Error de tiempo de ejecución (división por cero, índice fuera de rango...).
-    También se puede capturar con 'intentar_ruta / obstaculo'."""
+    También se puede capturar con 'explorar / imprevisto'."""
     def __init__(self, mensaje, linea):
         super().__init__(mensaje, linea)
         self.mensaje = mensaje
@@ -68,7 +68,7 @@ class Entorno:
 class FuncionRuta:
     def __init__(self, nombre, params, cuerpo, entorno, clase=None):
         self.nombre, self.params, self.cuerpo, self.entorno = nombre, params, cuerpo, entorno
-        self.clase = clase          # módulo donde se definió (para 'superior')
+        self.clase = clase          # campamento donde se definió (para 'superior')
 
 
 class ClaseRuta:
@@ -141,7 +141,7 @@ class Interprete:
             self.hoist(programa, self.global_env)
             self.bloque(programa, self.global_env)
         except RetornoSignal as s:
-            raise ErrorEjecucion("'entregar' fuera de una tarea", s.linea)
+            raise ErrorEjecucion("'regresar' fuera de un trayecto", s.linea)
         except RomperSignal as s:
             raise ErrorEjecucion("'detener' fuera de un ciclo", s.linea)
         except ContinuarSignal as s:
@@ -150,7 +150,7 @@ class Interprete:
             self.cerrar_bd()
 
     def hoist(self, sentencias, env):
-        """Registra tareas y módulos antes de ejecutar: se pueden usar antes de declararse."""
+        """Registra trayectos y campamentos antes de ejecutar: se pueden usar antes de declararse."""
         for s in sentencias:
             if isinstance(s, (Funcion, Clase)):
                 getattr(self, "exec_" + type(s).__name__)(s, env)
@@ -170,8 +170,8 @@ class Interprete:
         if isinstance(v, list):
             return "[" + ", ".join(self.texto(x, True) for x in v) + "]"
         if isinstance(v, Instancia): return "<%s>" % v.clase.nombre
-        if isinstance(v, FuncionRuta): return "<tarea %s>" % v.nombre
-        if isinstance(v, ClaseRuta): return "<módulo %s>" % v.nombre
+        if isinstance(v, FuncionRuta): return "<trayecto %s>" % v.nombre
+        if isinstance(v, ClaseRuta): return "<campamento %s>" % v.nombre
         return str(v)
 
     def verdadero(self, v):
@@ -302,7 +302,7 @@ class Interprete:
         try:
             dato = self.entrada().strip()
         except EOFError:
-            raise ErrorEjecucion("no hay datos de entrada para 'escanear'", n.linea)
+            raise ErrorEjecucion("no hay datos de entrada para 'preguntar'", n.linea)
         for conv in (int, float):
             try:
                 dato = conv(dato)
@@ -367,7 +367,7 @@ class Interprete:
             if n.defecto is not None:
                 self.bloque(n.defecto, env)
         except RomperSignal:
-            pass                            # 'detener' dentro de un punto_ruta sale del bifurcar
+            pass                            # 'detener' dentro de un mirador sale del bifurcar
 
     def exec_Funcion(self, n, env):
         env.definir(n.nombre, FuncionRuta(n.nombre, n.params, n.cuerpo, env))
@@ -417,7 +417,7 @@ class Interprete:
     def eval_Mismo(self, n, env):
         e = env.buscar("mismo")
         if e is None:
-            raise ErrorEjecucion("'mismo' solo se puede usar dentro de un módulo", n.linea)
+            raise ErrorEjecucion("'mismo' solo se puede usar dentro de un campamento", n.linea)
         return e.vars["mismo"]
 
     def eval_Lista(self, n, env):
@@ -525,30 +525,30 @@ class Interprete:
         if e is not None:
             f = e.vars[n.nombre]
             if not isinstance(f, FuncionRuta):
-                raise ErrorEjecucion("'%s' no es una tarea" % n.nombre, n.linea)
+                raise ErrorEjecucion("'%s' no es un trayecto" % n.nombre, n.linea)
             return self.llamar(f, args, n.linea)
         if n.nombre in self.predefinidas:
             minimo, maximo = ARIDAD_PREDEFINIDAS[n.nombre]
             if not (minimo <= len(args) <= maximo):
                 raise ErrorEjecucion("'%s' recibió %d argumento(s) y no es válido" % (n.nombre, len(args)), n.linea)
             return self.predefinidas[n.nombre](args, n.linea)
-        raise ErrorEjecucion("tarea '%s' no definida" % n.nombre, n.linea)
+        raise ErrorEjecucion("trayecto '%s' no definido" % n.nombre, n.linea)
 
-    # ---------- módulos (clases) ----------
+    # ---------- campamentos (clases) ----------
     def padre_de(self, clase, linea):
         if clase.padre is None:
             return None
         e = clase.entorno.buscar(clase.padre)
         if e is None or not isinstance(e.vars[clase.padre], ClaseRuta):
-            raise ErrorEjecucion("el módulo padre '%s' no está definido" % clase.padre, linea)
+            raise ErrorEjecucion("el campamento padre '%s' no está definido" % clase.padre, linea)
         return e.vars[clase.padre]
 
     def cadena(self, clase, linea):
-        """Lista de módulos desde la clase hasta su ancestro más lejano."""
+        """Lista de campamentos desde la clase hasta su ancestro más lejano."""
         cadena, vistos = [], set()
         while clase is not None:
             if id(clase) in vistos:
-                raise ErrorEjecucion("herencia circular en el módulo '%s'" % clase.nombre, linea)
+                raise ErrorEjecucion("herencia circular en el campamento '%s'" % clase.nombre, linea)
             vistos.add(id(clase))
             cadena.append(clase)
             clase = self.padre_de(clase, linea)
@@ -567,20 +567,20 @@ class Interprete:
             raise ErrorEjecucion("solo los objetos tienen métodos", n.linea)
         metodo = self.buscar_metodo(obj.clase, n.nombre, n.linea)
         if metodo is None:
-            raise ErrorEjecucion("el módulo '%s' no tiene el método '%s'" % (obj.clase.nombre, n.nombre), n.linea)
+            raise ErrorEjecucion("el campamento '%s' no tiene el método '%s'" % (obj.clase.nombre, n.nombre), n.linea)
         return self.llamar(metodo, args, n.linea, mismo=obj)
 
     def ctor_de(self, clase, linea):
-        """Primer 'ensamblar' encontrado subiendo por la herencia: (clase, FuncionRuta) o None."""
+        """Primer 'armar' encontrado subiendo por la herencia: (clase, FuncionRuta) o None."""
         for c in self.cadena(clase, linea):
             if c.params_ctor is not None:
-                return FuncionRuta(c.nombre + ".ensamblar", c.params_ctor, c.cuerpo_ctor, c.entorno, c)
+                return FuncionRuta(c.nombre + ".armar", c.params_ctor, c.cuerpo_ctor, c.entorno, c)
         return None
 
     def eval_Nuevo(self, n, env):
         e = env.buscar(n.clase)
         if e is None or not isinstance(e.vars[n.clase], ClaseRuta):
-            raise ErrorEjecucion("módulo '%s' no definido" % n.clase, n.linea)
+            raise ErrorEjecucion("campamento '%s' no definido" % n.clase, n.linea)
         clase = e.vars[n.clase]
         args = [self.evaluar(a, env) for a in n.args]
         obj = Instancia(clase)
@@ -591,7 +591,7 @@ class Interprete:
         ctor = self.ctor_de(clase, n.linea)
         if ctor is None:
             if args:
-                raise ErrorEjecucion("el módulo '%s' no tiene 'ensamblar' y recibió %d argumento(s)" % (clase.nombre, len(args)), n.linea)
+                raise ErrorEjecucion("el campamento '%s' no tiene 'armar' y recibió %d argumento(s)" % (clase.nombre, len(args)), n.linea)
         else:
             self.llamar(ctor, args, n.linea, mismo=obj)
         return obj
@@ -600,20 +600,20 @@ class Interprete:
         ec = env.buscar("$clase")
         em = env.buscar("mismo")
         if ec is None or em is None:
-            raise ErrorEjecucion("'superior' solo se puede usar dentro de un módulo", n.linea)
+            raise ErrorEjecucion("'superior' solo se puede usar dentro de un campamento", n.linea)
         actual, obj = ec.vars["$clase"], em.vars["mismo"]
         padre = self.padre_de(actual, n.linea)
         if padre is None:
-            raise ErrorEjecucion("el módulo '%s' no extiende a ningún otro" % actual.nombre, n.linea)
+            raise ErrorEjecucion("el campamento '%s' no extiende a ningún otro" % actual.nombre, n.linea)
         args = [self.evaluar(a, env) for a in n.args]
-        if n.metodo == "ensamblar":
+        if n.metodo == "armar":
             f = self.ctor_de(padre, n.linea)
             if f is None:
                 if args:
-                    raise ErrorEjecucion("el módulo padre no tiene 'ensamblar'", n.linea)
+                    raise ErrorEjecucion("el campamento padre no tiene 'armar'", n.linea)
                 return None
         else:
             f = self.buscar_metodo(padre, n.metodo, n.linea)
             if f is None:
-                raise ErrorEjecucion("el módulo padre no tiene el método '%s'" % n.metodo, n.linea)
+                raise ErrorEjecucion("el campamento padre no tiene el método '%s'" % n.metodo, n.linea)
         return self.llamar(f, args, n.linea, mismo=obj)

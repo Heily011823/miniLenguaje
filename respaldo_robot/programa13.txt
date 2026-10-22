@@ -1,0 +1,82 @@
+# Programa 13: Excepciones (anidadas, en funciones, destino, sin variable)
+tarea dividir(a, b):
+  entregar a / b;
+fin_ruta
+
+tarea validar(edad):
+  evaluar edad < 0:
+    alerta "edad negativa";
+  fin_ruta
+  entregar edad;
+fin_ruta
+
+intentar_ruta:
+  notificar(dividir(10, 2));
+  notificar(dividir(1, 0));
+  notificar("no se imprime");
+obstaculo e:
+  notificar("Error 1: " + e);
+destino:
+  notificar("cierre 1");
+fin_ruta
+
+intentar_ruta:
+  intentar_ruta:
+    validar(-5);
+  obstaculo interno:
+    notificar("interno: " + interno);
+    alerta "reenviado: " + interno;
+  destino:
+    notificar("destino interno");
+  fin_ruta
+obstaculo externo:
+  notificar("externo: " + externo);
+fin_ruta
+
+intentar_ruta:
+  cargar l en [1, 2];
+  notificar(l[2]);
+obstaculo:
+  notificar("indice invalido capturado");
+fin_ruta
+
+intentar_ruta:
+  notificar(desconocida);
+obstaculo m:
+  notificar("capturado: " + m);
+fin_ruta
+
+intentar_ruta:
+  notificar("solo con destino");
+destino:
+  notificar("destino sin obstaculo");
+fin_ruta
+
+recorrer i partiendo_de 1 llegando_a 4:
+  intentar_ruta:
+    evaluar i == 2:
+      avanzar;
+    fin_ruta
+    evaluar i == 4:
+      detener;
+    fin_ruta
+    notificar("i = " + i);
+  destino:
+    notificar("destino i = " + i);
+  fin_ruta
+fin_ruta
+
+tarea con_return():
+  intentar_ruta:
+    entregar "desde try";
+  destino:
+    notificar("destino antes de retornar");
+  fin_ruta
+fin_ruta
+notificar(con_return());
+
+intentar_ruta:
+  alerta [1, 2, 3];
+obstaculo q:
+  notificar(q);
+fin_ruta

@@ -2,13 +2,13 @@
 
 Detecta, sin ejecutar el programa:
   * variables usadas sin declarar,
-  * tareas o módulos inexistentes y número de argumentos incorrecto,
+  * trayectos o campamentos inexistentes y número de argumentos incorrecto,
   * tipos incompatibles cuando se conocen con seguridad (p. ej. "a" - 1),
-  * 'entregar' fuera de una tarea, 'detener'/'avanzar' fuera de un ciclo,
-  * 'mismo' / 'superior' fuera de un módulo.
+  * 'regresar' fuera de un trayecto, 'detener'/'avanzar' fuera de un ciclo,
+  * 'mismo' / 'superior' fuera de un campamento.
 
 Es CONSERVADOR: solo reporta cuando está seguro de que el programa fallaría.
-Lo encontrado dentro de un 'intentar_ruta' se informa como advertencia (no
+Lo encontrado dentro de un 'explorar' se informa como advertencia (no
 detiene la ejecución), porque el programador pudo querer capturar ese error.
 """
 from nodos import *
@@ -43,10 +43,10 @@ class Analizador:
         self.bucles = 0
         self.switches = 0
         self.en_funcion = False
-        self.clase_actual = None      # Clase (nodo) mientras se analiza un módulo
+        self.clase_actual = None      # Clase (nodo) mientras se analiza un campamento
         self.glob = Ambito(True)
         self.funciones = {}           # nombre -> nº de parámetros (None si hay ambigüedad)
-        self.anidadas = set()         # tareas declaradas dentro de otras tareas o métodos
+        self.anidadas = set()         # trayectos declarados dentro de otros trayectos o métodos
         self.clases = {}              # nombre -> nodo Clase
 
     # ------------------------------------------------------------------ API
@@ -68,7 +68,7 @@ class Analizador:
 
     # ------------------------------------------------ recolección (pre-pasada)
     def recorrer(self, sentencias, fn):
-        """Aplica fn a cada sentencia, entrando a los bloques pero no a tareas/módulos."""
+        """Aplica fn a cada sentencia, entrando a los bloques pero no a trayectos/campamentos."""
         for s in sentencias:
             fn(s)
             if isinstance(s, Si):
@@ -154,7 +154,7 @@ class Analizador:
                 g.agregar_tipo(s.destino.nombre, self.tipo_silencioso(s.valor, g))
         self.recorrer(self.programa, asignaciones)
 
-        # Asignaciones a variables globales hechas desde dentro de tareas/métodos
+        # Asignaciones a variables globales hechas desde dentro de trayectos/métodos
         for params, cuerpo in self.todas_las_funciones():
             loc = self.locales_de(params, cuerpo)
 
@@ -291,15 +291,15 @@ class Analizador:
 
     def s_Retorno(self, n, amb):
         if not self.en_funcion:
-            self.err(n.linea, "'entregar' solo se puede usar dentro de una tarea")
+            self.err(n.linea, "'regresar' solo se puede usar dentro de un trayecto")
         self.expr(n.valor, amb)
 
     def s_Clase(self, n, amb):
         if n.padre is not None:
             if n.padre not in self.clases:
-                self.err(n.linea, "el módulo padre '%s' no está definido" % n.padre)
+                self.err(n.linea, "el campamento padre '%s' no está definido" % n.padre)
             elif n.padre == n.nombre:
-                self.err(n.linea, "un módulo no puede extenderse a sí mismo")
+                self.err(n.linea, "un campamento no puede extenderse a sí mismo")
         guardado = self.clase_actual
         self.clase_actual = n
         for campo in n.campos:
@@ -362,7 +362,7 @@ class Analizador:
 
     def e_Mismo(self, n, amb):
         if self.clase_actual is None:
-            self.err(n.linea, "'mismo' solo se puede usar dentro de un módulo")
+            self.err(n.linea, "'mismo' solo se puede usar dentro de un campamento")
         return None
 
     def e_Lista(self, n, amb):
@@ -413,11 +413,11 @@ class Analizador:
             self.expr(a, amb)
         nombre = n.nombre
         if nombre in amb.locales or nombre in self.anidadas:
-            return None                 # parámetro/variable que guarda una tarea, o tarea anidada
+            return None                 # parámetro/variable que guarda un trayecto, o trayecto anidado
         if nombre in self.funciones:
             esperado = self.funciones[nombre]
             if esperado is not None and esperado != len(n.args):
-                self.err(n.linea, "la tarea '%s' espera %d argumento(s) y recibe %d" % (nombre, esperado, len(n.args)))
+                self.err(n.linea, "el trayecto '%s' espera %d argumento(s) y recibe %d" % (nombre, esperado, len(n.args)))
             return None
         if nombre in ARIDAD_PREDEFINIDAS:
             mini, maxi = ARIDAD_PREDEFINIDAS[nombre]
@@ -427,7 +427,7 @@ class Analizador:
             return TIPO_RETORNO.get(nombre)
         if nombre in self.glob.locales or nombre in self.glob.declarados:
             return None
-        self.err(n.linea, "la tarea '%s' no está definida" % nombre)
+        self.err(n.linea, "el trayecto '%s' no está definido" % nombre)
         return None
 
     def e_LlamadaMetodo(self, n, amb):
@@ -450,7 +450,7 @@ class Analizador:
         return "texto" if tobj == "texto" else None
 
     def cadena_ctor(self, nombre):
-        """Parámetros del primer 'ensamblar' en la cadena de herencia (None si no hay)."""
+        """Parámetros del primer 'armar' en la cadena de herencia (None si no hay)."""
         vistos = set()
         while nombre in self.clases and nombre not in vistos:
             vistos.add(nombre)
@@ -464,12 +464,12 @@ class Analizador:
         for a in n.args:
             self.expr(a, amb)
         if n.clase not in self.clases:
-            self.err(n.linea, "el módulo '%s' no está definido" % n.clase)
+            self.err(n.linea, "el campamento '%s' no está definido" % n.clase)
             return None
         params = self.cadena_ctor(n.clase)
         esperado = len(params) if params is not None else 0
         if esperado != len(n.args):
-            self.err(n.linea, "el módulo '%s' espera %d argumento(s) en 'ensamblar' y recibe %d"
+            self.err(n.linea, "el campamento '%s' espera %d argumento(s) en 'armar' y recibe %d"
                      % (n.clase, esperado, len(n.args)))
         return None
 
@@ -477,9 +477,9 @@ class Analizador:
         for a in n.args:
             self.expr(a, amb)
         if self.clase_actual is None:
-            self.err(n.linea, "'superior' solo se puede usar dentro de un módulo")
+            self.err(n.linea, "'superior' solo se puede usar dentro de un campamento")
         elif self.clase_actual.padre is None:
-            self.err(n.linea, "el módulo '%s' no extiende a ningún otro, no puede usar 'superior'"
+            self.err(n.linea, "el campamento '%s' no extiende a ningún otro, no puede usar 'superior'"
                      % self.clase_actual.nombre)
         return None
 
