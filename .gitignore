@@ -17,3 +17,6 @@ env/
 .vscode/
 .idea/
 *.log
+
+respaldo_robot/
+cambiar_tema/
