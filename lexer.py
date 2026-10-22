@@ -4,7 +4,11 @@ Convierte el texto del programa en una lista de tokens. Cada token guarda su
 tipo, su lexema y la línea donde aparece. Los errores léxicos (símbolos
 desconocidos, cadenas sin cerrar) se acumulan en una lista aparte.
 """
+
+# Permite trabajar con expresiones regulares.
 import re
+
+# Permite crear una clase para almacenar los datos de cada token.
 from dataclasses import dataclass
 
 # Palabra reservada -> tipo de token
@@ -55,19 +59,45 @@ ESPECIFICACION = [
     ("DOS_PUNTOS", r":"), ("PUNTO_COMA", r";"),
     ("ERROR", r"."),                         # cualquier otro carácter
 ]
+
 PATRON = re.compile("|".join("(?P<%s>%s)" % par for par in ESPECIFICACION))
 
+""" 
+    Representa un token reconocido durante el análisis léxico.
 
+    Atributos:
+        tipo: categoría a la que pertenece el token.
+        lexema: texto exacto encontrado en el programa.
+        linea: número de línea donde aparece.
+"""
 @dataclass
 class Token:
     tipo: str
     lexema: str
     linea: int
 
+    """
+        Devuelve una representación del token como texto.
+
+        Retorna:
+            Una cadena con el número de línea, el tipo y el lexema.
+    """
     def __str__(self):
         return "[line %d] %s %s" % (self.linea, self.tipo, self.lexema)
 
 
+"""
+    Analiza el código fuente y reconoce sus tokens.
+
+    Parámetros:
+        codigo: texto del programa escrito.
+
+    Retorna:
+        Una tupla con dos elementos:
+        - tokens: lista de tokens encontrados, incluyendo el token EOF.
+        - errores: lista de tuplas con el número de línea y el mensaje
+          de cada error léxico detectado.
+"""
 def analizar(codigo):
     """Devuelve (tokens, errores). errores es una lista de (linea, mensaje)."""
     tokens, errores = [], []
