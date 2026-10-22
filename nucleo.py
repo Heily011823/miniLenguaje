@@ -14,8 +14,8 @@ def correr(codigo, entrada, salida, reportar, mostrar_tokens=True, semantico=Tru
     """Devuelve 0 si todo salió bien y 1 si hubo algún error.
 
     reportar(canal, texto): canal = 'fase' | 'tokens' | 'error' | 'aviso' | 'info'
-    salida(texto): una línea de salida del programa (notificar)
-    entrada(): lee una línea (escanear)
+    salida(texto): una línea de salida del programa (anotar)
+    entrada(): lee una línea (preguntar)
     """
     # 1) Análisis léxico
     tokens, errores = analizar(codigo)
@@ -44,7 +44,7 @@ def correr(codigo, entrada, salida, reportar, mostrar_tokens=True, semantico=Tru
         errs, avisos = analizar_semantica(programa)
         for linea, msg in avisos:
             reportar("aviso", "Advertencia semántica en la línea %d: %s (está dentro de "
-                              "intentar_ruta, se ejecutará de todos modos)" % (linea, msg))
+                              "explorar, se ejecutará de todos modos)" % (linea, msg))
         for linea, msg in errs:
             reportar("error", "Error semántico en la línea %d: %s" % (linea, msg))
         if errs:

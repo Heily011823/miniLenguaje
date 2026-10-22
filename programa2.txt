@@ -1,17 +1,17 @@
-# Programa 2: Suma de tiempo de entregas en arreglos
-tarea calcular_tiempo(paquetes, n):
+# Programa 2: Suma del tiempo de cada tramo del sendero
+trayecto calcular_tiempo(tramos, n):
     cargar total en 0;
     recorrer i partiendo_de 0 llegando_a n - 1:
-        total en total + paquetes[i];
-    fin_ruta
-    entregar total;
-fin_ruta
+        total en total + tramos[i];
+    fin_sendero
+    regresar total;
+fin_sendero
 
-cargar envios en [4, 8, 15, 16];
-cargar resultado en calcular_tiempo(envios, 4);
+cargar tiempos en [4, 8, 15, 16];
+cargar resultado en calcular_tiempo(tiempos, 4);
 
 evaluar resultado > 40 junto_con resultado < 50:
-    notificar("El tiempo total de ruta es " + resultado);
+    anotar("El tiempo total del sendero es " + resultado);
 alternativa:
-    notificar("Ruta fuera del tiempo limite");
-fin_ruta
+    anotar("Sendero fuera del tiempo limite");
+fin_sendero

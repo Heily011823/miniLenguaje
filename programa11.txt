@@ -1,37 +1,37 @@
 # Programa 11: Funciones que llaman funciones, uso antes de declarar y recursion
-notificar(cuadrado_suma(2, 3));
+anotar(cuadrado_suma(2, 3));
 
-tarea suma(a, b):
-  entregar a + b;
-fin_ruta
+trayecto suma(a, b):
+  regresar a + b;
+fin_sendero
 
-tarea cuadrado_suma(a, b):
-  entregar cuadrado(suma(a, b)) + suma(1, 1);
-fin_ruta
+trayecto cuadrado_suma(a, b):
+  regresar cuadrado(suma(a, b)) + suma(1, 1);
+fin_sendero
 
-tarea cuadrado(x):
-  entregar x * x;
-fin_ruta
+trayecto cuadrado(x):
+  regresar x * x;
+fin_sendero
 
-tarea fib(n):
+trayecto fib(n):
   evaluar n < 2:
-    entregar n;
-  fin_ruta
-  entregar fib(n - 1) + fib(n - 2);
-fin_ruta
+    regresar n;
+  fin_sendero
+  regresar fib(n - 1) + fib(n - 2);
+fin_sendero
 
-tarea cuenta_regresiva(n):
+trayecto cuenta_regresiva(n):
   evaluar n == 0:
-    entregar "listo";
-  fin_ruta
-  entregar cuenta_regresiva(n - 1);
-fin_ruta
+    regresar "listo";
+  fin_sendero
+  regresar cuenta_regresiva(n - 1);
+fin_sendero
 
-tarea sin_retorno():
+trayecto sin_retorno():
   cargar x en 1;
-fin_ruta
+fin_sendero
 
-notificar("fib(15) = " + fib(15));
-notificar(cuenta_regresiva(3000));
-notificar(sin_retorno());
-notificar(suma(suma(1, 2), suma(3, 4)) * 2);
+anotar("fib(15) = " + fib(15));
+anotar(cuenta_regresiva(3000));
+anotar(sin_retorno());
+anotar(suma(suma(1, 2), suma(3, 4)) * 2);

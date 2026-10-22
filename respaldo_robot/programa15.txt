@@ -1,0 +1,20 @@
+# Programa 15: Errores semanticos (se detectan ANTES de ejecutar)
+cargar a en 5;
+cargar b en "hola";
+notificar(a + c);
+notificar(b - 1);
+d en 10;
+notificar(inexistente(3));
+tarea doble(x):
+  entregar x * 2;
+fin_ruta
+notificar(doble(1, 2));
+cargar r en desplegar Fantasma();
+detener;
+entregar 5;
+notificar(mismo.x);
+recorrer i partiendo_de 1 llegando_a "diez":
+  notificar(i);
+fin_ruta
+notificar(longitud());
+notificar(a[0]);

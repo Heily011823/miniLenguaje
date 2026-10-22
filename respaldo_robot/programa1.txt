@@ -1,0 +1,8 @@
+# Programa 1: Evaluacion de distancia de entrega
+cargar distancia en 20;
+
+evaluar distancia > 5:
+    notificar("La entrega esta lejos de la biblioteca");
+alternativa:
+    notificar("El robot ha llegado al destino");
+fin_ruta

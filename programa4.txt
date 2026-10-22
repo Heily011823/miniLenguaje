@@ -1,22 +1,22 @@
-# Programa 4: Patrulla con lectura, desvios, detener y avanzar
+# Programa 4: Caminata con lectura, desvios, detener y avanzar
 cargar contador en 0;
 cargar limite en 0;
 
-notificar("Cuantas paradas tiene la ruta?");
-escanear(limite);
+anotar("Cuantas paradas tiene el sendero?");
+preguntar(limite);
 
-patrullar contador < limite:
+caminar contador < limite:
     contador en contador + 1;
 
     evaluar contador % 2 == 0:
-        notificar("Parada " + contador + ": pasillo par, se omite");
+        anotar("Parada " + contador + ": mirador cerrado, se omite");
         avanzar;
     desviar contador == 5:
-        notificar("Parada 5: obstaculo en la ruta, el robot se detiene");
+        anotar("Parada 5: derrumbe en el sendero, la excursion se detiene");
         detener;
     alternativa:
-        notificar("Entregando en la parada " + contador);
-    fin_ruta
-fin_ruta
+        anotar("Descansando en la parada " + contador);
+    fin_sendero
+fin_sendero
 
-notificar("Recorrido terminado en la parada " + contador);
+anotar("Recorrido terminado en la parada " + contador);

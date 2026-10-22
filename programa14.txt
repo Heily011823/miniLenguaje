@@ -1,52 +1,52 @@
 # Programa 14: bifurcar (switch) y rondar (do-while)
 cargar dia en 3;
 bifurcar dia:
-  punto_ruta 1:
-    notificar("lunes");
-  punto_ruta 3:
-    notificar("miercoles");
-  punto_ruta 5:
-    notificar("viernes");
-  ruta_base:
-    notificar("otro dia");
-fin_ruta
+  mirador 1:
+    anotar("lunes");
+  mirador 3:
+    anotar("miercoles");
+  mirador 5:
+    anotar("viernes");
+  sendero_base:
+    anotar("otro dia");
+fin_sendero
 
 bifurcar "b":
-  punto_ruta "a":
-    notificar("es a");
-  punto_ruta "b":
-    notificar("es b");
+  mirador "a":
+    anotar("es a");
+  mirador "b":
+    anotar("es b");
     detener;
-    notificar("no se imprime");
-  ruta_base:
-    notificar("ni a ni b");
-fin_ruta
+    anotar("no se imprime");
+  sendero_base:
+    anotar("ni a ni b");
+fin_sendero
 
 bifurcar 99:
-  punto_ruta 1:
-    notificar("uno");
-fin_ruta
-notificar("sin coincidencia ok");
+  mirador 1:
+    anotar("uno");
+fin_sendero
+anotar("sin coincidencia ok");
 
 cargar n en 0;
-rondar:
+ascender:
   n en n + 1;
-  notificar("n = " + n);
+  anotar("n = " + n);
 repetir_si n < 3;
 
 cargar z en 10;
-rondar:
-  notificar("se ejecuta una vez aunque sea falso");
+ascender:
+  anotar("se ejecuta una vez aunque sea falso");
 repetir_si z < 5;
 
 cargar t en 0;
-rondar:
+ascender:
   t en t + 1;
   evaluar t == 2:
     avanzar;
-  fin_ruta
+  fin_sendero
   evaluar t == 4:
     detener;
-  fin_ruta
-  notificar("t = " + t);
+  fin_sendero
+  anotar("t = " + t);
 repetir_si t < 10;
