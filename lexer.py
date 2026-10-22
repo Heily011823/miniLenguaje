@@ -11,30 +11,30 @@ from dataclasses import dataclass
 PALABRAS_RESERVADAS = {
     # variables y E/S
     "cargar": "KW_CARGAR", "en": "KW_EN",
-    "notificar": "KW_NOTIFICAR", "escanear": "KW_ESCANEAR",
+    "anotar": "KW_NOTIFICAR", "preguntar": "KW_ESCANEAR",
     # condicionales
     "evaluar": "KW_EVALUAR", "desviar": "KW_DESVIAR", "alternativa": "KW_ALTERNATIVA",
     # ciclos
-    "patrullar": "KW_PATRULLAR",
+    "caminar": "KW_PATRULLAR",
     "recorrer": "KW_RECORRER", "partiendo_de": "KW_PARTIENDO_DE", "llegando_a": "KW_LLEGANDO_A",
-    "rondar": "KW_RONDAR", "repetir_si": "KW_REPETIR_SI",
+    "ascender": "KW_RONDAR", "repetir_si": "KW_REPETIR_SI",
     "detener": "KW_DETENER", "avanzar": "KW_AVANZAR",
     # switch
-    "bifurcar": "KW_BIFURCAR", "punto_ruta": "KW_PUNTO_RUTA", "ruta_base": "KW_RUTA_BASE",
+    "bifurcar": "KW_BIFURCAR", "mirador": "KW_PUNTO_RUTA", "sendero_base": "KW_RUTA_BASE",
     # funciones y clases
-    "tarea": "KW_TAREA", "entregar": "KW_ENTREGAR",
-    "modulo": "KW_MODULO", "ensamblar": "KW_ENSAMBLAR",
-    "desplegar": "KW_DESPLEGAR", "mismo": "KW_MISMO",
+    "trayecto": "KW_TAREA", "regresar": "KW_ENTREGAR",
+    "campamento": "KW_MODULO", "armar": "KW_ENSAMBLAR",
+    "montar": "KW_DESPLEGAR", "mismo": "KW_MISMO",
     "extiende": "KW_EXTIENDE", "superior": "KW_SUPERIOR",
     # excepciones
-    "intentar_ruta": "KW_INTENTAR_RUTA", "obstaculo": "KW_OBSTACULO",
-    "destino": "KW_DESTINO", "alerta": "KW_ALERTA",
+    "explorar": "KW_INTENTAR_RUTA", "imprevisto": "KW_OBSTACULO",
+    "recoger": "KW_DESTINO", "tormenta": "KW_ALERTA",
     # lógicos
     "junto_con": "KW_Y", "o_bien": "KW_O", "contrario_de": "KW_NO",
     # literales
     "nulo": "KW_NULO",
     # fin de bloque
-    "fin_ruta": "KW_FIN_RUTA",
+    "fin_sendero": "KW_FIN_RUTA",
 }
 
 # El orden importa: Python prueba los patrones de arriba hacia abajo.

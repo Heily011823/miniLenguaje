@@ -80,7 +80,7 @@ class Parser:
             sentencias.append(self.sentencia())
         return sentencias
 
-    def bloque(self, terminadores, esperado="'fin_ruta'"):
+    def bloque(self, terminadores, esperado="'fin_sendero'"):
         sentencias = []
         while not self.es(*terminadores):
             if self.es("EOF"):
@@ -141,7 +141,7 @@ class Parser:
         inicio = self.actual
         destino = self.primario()
         if not isinstance(destino, (Var, Atributo, Indice)):
-            raise ErrorSintactico(inicio.linea, "'escanear' necesita una variable, un elemento "
+            raise ErrorSintactico(inicio.linea, "'preguntar' necesita una variable, un elemento "
                                   "de lista o un atributo")
         self.esperar("PAREN_DER", "')'")
         self.esperar("PUNTO_COMA", "';'")
@@ -163,7 +163,7 @@ class Parser:
             self.consumir()
             self.esperar("DOS_PUNTOS", "':'")
             sino = self.bloque(("KW_FIN_RUTA",))
-        self.esperar("KW_FIN_RUTA", "'fin_ruta'")
+        self.esperar("KW_FIN_RUTA", "'fin_sendero'")
         return Si(tok.linea, ramas, sino)
 
     def ciclo_mientras(self):
@@ -171,7 +171,7 @@ class Parser:
         cond = self.expresion()
         self.esperar("DOS_PUNTOS", "':'")
         cuerpo = self.bloque(("KW_FIN_RUTA",))
-        self.esperar("KW_FIN_RUTA", "'fin_ruta'")
+        self.esperar("KW_FIN_RUTA", "'fin_sendero'")
         return Mientras(tok.linea, cond, cuerpo)
 
     def ciclo_rondar(self):
@@ -192,7 +192,7 @@ class Parser:
         hasta = self.expresion()
         self.esperar("DOS_PUNTOS", "':'")
         cuerpo = self.bloque(("KW_FIN_RUTA",))
-        self.esperar("KW_FIN_RUTA", "'fin_ruta'")
+        self.esperar("KW_FIN_RUTA", "'fin_sendero'")
         return Para(tok.linea, var.lexema, desde, hasta, cuerpo)
 
     def bifurcar(self):
@@ -210,7 +210,7 @@ class Parser:
             self.consumir()
             self.esperar("DOS_PUNTOS", "':'")
             defecto = self.bloque(("KW_FIN_RUTA",))
-        self.esperar("KW_FIN_RUTA", "'punto_ruta', 'ruta_base' o 'fin_ruta'")
+        self.esperar("KW_FIN_RUTA", "'mirador', 'sendero_base' o 'fin_sendero'")
         return Bifurcar(tok.linea, expr, casos, defecto)
 
     def parametros(self):
@@ -224,13 +224,13 @@ class Parser:
 
     def funcion(self):
         tok = self.consumir()
-        nombre = self.esperar("ID", "el nombre de la tarea")
+        nombre = self.esperar("ID", "el nombre del trayecto")
         self.esperar("PAREN_IZQ", "'('")
         params = self.parametros()
         self.esperar("PAREN_DER", "')'")
         self.esperar("DOS_PUNTOS", "':'")
         cuerpo = self.bloque(("KW_FIN_RUTA",))
-        self.esperar("KW_FIN_RUTA", "'fin_ruta'")
+        self.esperar("KW_FIN_RUTA", "'fin_sendero'")
         return Funcion(tok.linea, nombre.lexema, params, cuerpo)
 
     def retorno(self):
@@ -241,39 +241,39 @@ class Parser:
 
     def clase(self):
         tok = self.consumir()
-        nombre = self.esperar("ID", "el nombre del módulo")
+        nombre = self.esperar("ID", "el nombre del campamento")
         padre = None
         if self.es("KW_EXTIENDE"):
             self.consumir()
-            padre = self.esperar("ID", "el nombre del módulo padre").lexema
+            padre = self.esperar("ID", "el nombre del campamento padre").lexema
         self.esperar("DOS_PUNTOS", "':'")
         params, cuerpo, metodos, campos = None, [], [], []
         while not self.es("KW_FIN_RUTA"):
             if self.es("EOF"):
-                self.error("'fin_ruta'")
+                self.error("'fin_sendero'")
             if self.es("KW_ENSAMBLAR"):
                 if params is not None:
-                    raise ErrorSintactico(self.actual.linea, "el módulo ya tiene un 'ensamblar'")
+                    raise ErrorSintactico(self.actual.linea, "el campamento ya tiene un 'armar'")
                 self.consumir()
                 self.esperar("PAREN_IZQ", "'('")
                 params = self.parametros()
                 self.esperar("PAREN_DER", "')'")
                 self.esperar("DOS_PUNTOS", "':'")
                 cuerpo = self.bloque(("KW_FIN_RUTA",))
-                self.esperar("KW_FIN_RUTA", "'fin_ruta'")
+                self.esperar("KW_FIN_RUTA", "'fin_sendero'")
             elif self.es("KW_TAREA"):
                 metodos.append(self.funcion())
             elif self.es("KW_CARGAR"):
                 campos.append(self.declaracion())
             else:
-                self.error("'ensamblar', 'tarea', 'cargar' o 'fin_ruta'")
-        self.esperar("KW_FIN_RUTA", "'fin_ruta'")
+                self.error("'armar', 'trayecto', 'cargar' o 'fin_sendero'")
+        self.esperar("KW_FIN_RUTA", "'fin_sendero'")
         return Clase(tok.linea, nombre.lexema, padre, params, cuerpo, metodos, campos)
 
     def excepcion(self):
         tok = self.consumir()
         self.esperar("DOS_PUNTOS", "':'")
-        cuerpo = self.bloque(("KW_OBSTACULO", "KW_DESTINO", "KW_FIN_RUTA"), "'obstaculo'")
+        cuerpo = self.bloque(("KW_OBSTACULO", "KW_DESTINO", "KW_FIN_RUTA"), "'imprevisto'")
         var, capturar, final = None, None, None
         if self.es("KW_OBSTACULO"):
             self.consumir()
@@ -286,8 +286,8 @@ class Parser:
             self.esperar("DOS_PUNTOS", "':'")
             final = self.bloque(("KW_FIN_RUTA",))
         if capturar is None and final is None:
-            self.error("'obstaculo' o 'destino'")
-        self.esperar("KW_FIN_RUTA", "'fin_ruta'")
+            self.error("'imprevisto' o 'recoger'")
+        self.esperar("KW_FIN_RUTA", "'fin_sendero'")
         return Intentar(tok.linea, cuerpo, var, capturar, final)
 
     def lanzar(self):
@@ -438,7 +438,7 @@ class Parser:
             return Lista(tok.linea, elems)
         if t == "KW_DESPLEGAR":
             self.consumir()
-            nombre = self.esperar("ID", "el nombre de un módulo")
+            nombre = self.esperar("ID", "el nombre de un campamento")
             return Nuevo(tok.linea, nombre.lexema, self.argumentos())
         self.error("una expresión")
 

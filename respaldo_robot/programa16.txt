@@ -1,0 +1,22 @@
+# Programa 16: Base de datos SQLite desde Ruta
+enlazar("demo_ruta.db");
+consultar("DROP TABLE IF EXISTS entregas");
+consultar("CREATE TABLE entregas (id INTEGER PRIMARY KEY, destino TEXT, minutos REAL)");
+consultar("INSERT INTO entregas (destino, minutos) VALUES (?, ?)", ["Biblioteca", 12.5]);
+consultar("INSERT INTO entregas (destino, minutos) VALUES (?, ?)", ["Cafeteria", 7]);
+consultar("INSERT INTO entregas (destino, minutos) VALUES (?, ?)", ["Laboratorio", 20]);
+
+cargar filas en consultar("SELECT destino, minutos FROM entregas ORDER BY minutos");
+recorrer i partiendo_de 0 llegando_a longitud(filas) - 1:
+  notificar(filas[i][0] + " -> " + filas[i][1] + " min");
+fin_ruta
+
+cargar total en consultar("SELECT SUM(minutos) FROM entregas");
+notificar("Total: " + total[0][0]);
+
+intentar_ruta:
+  consultar("SELECT * FROM tabla_que_no_existe");
+obstaculo e:
+  notificar("Capturado: " + e);
+fin_ruta
+desenlazar();

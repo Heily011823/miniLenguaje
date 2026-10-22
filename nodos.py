@@ -69,7 +69,7 @@ class Retorno(Nodo):
 class Clase(Nodo):
     nombre: str
     padre: Optional[str]
-    params_ctor: Optional[List[str]]  # None si no declara 'ensamblar'
+    params_ctor: Optional[List[str]]  # None si no declara 'armar'
     cuerpo_ctor: list
     metodos: List[Funcion]
     campos: List[Declarar]            # atributos con valor por defecto
@@ -153,6 +153,6 @@ class Mismo(Nodo):
     pass
 
 @dataclass
-class Super(Nodo):                    # superior.metodo(args) / superior.ensamblar(args)
+class Super(Nodo):                    # superior.metodo(args) / superior.armar(args)
     metodo: str
     args: list
