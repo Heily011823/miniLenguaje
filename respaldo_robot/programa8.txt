@@ -1,6 +1,0 @@
-# Programa 8: Error de ejecucion sin capturar
-cargar a en 10;
-cargar b en 0;
-notificar("Antes de dividir");
-cargar c en a / b;
-notificar("Esto no se imprime");
