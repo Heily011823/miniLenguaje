@@ -1,82 +1,82 @@
 # Programa 13: Excepciones (anidadas, en funciones, destino, sin variable)
-tarea dividir(a, b):
-  entregar a / b;
-fin_ruta
+trayecto dividir(a, b):
+  regresar a / b;
+fin_sendero
 
-tarea validar(edad):
+trayecto validar(edad):
   evaluar edad < 0:
-    alerta "edad negativa";
-  fin_ruta
-  entregar edad;
-fin_ruta
+    tormenta "edad negativa";
+  fin_sendero
+  regresar edad;
+fin_sendero
 
-intentar_ruta:
-  notificar(dividir(10, 2));
-  notificar(dividir(1, 0));
-  notificar("no se imprime");
-obstaculo e:
-  notificar("Error 1: " + e);
-destino:
-  notificar("cierre 1");
-fin_ruta
+explorar:
+  anotar(dividir(10, 2));
+  anotar(dividir(1, 0));
+  anotar("no se imprime");
+imprevisto e:
+  anotar("Error 1: " + e);
+recoger:
+  anotar("cierre 1");
+fin_sendero
 
-intentar_ruta:
-  intentar_ruta:
+explorar:
+  explorar:
     validar(-5);
-  obstaculo interno:
-    notificar("interno: " + interno);
-    alerta "reenviado: " + interno;
-  destino:
-    notificar("destino interno");
-  fin_ruta
-obstaculo externo:
-  notificar("externo: " + externo);
-fin_ruta
+  imprevisto interno:
+    anotar("interno: " + interno);
+    tormenta "reenviado: " + interno;
+  recoger:
+    anotar("destino interno");
+  fin_sendero
+imprevisto externo:
+  anotar("externo: " + externo);
+fin_sendero
 
-intentar_ruta:
+explorar:
   cargar l en [1, 2];
-  notificar(l[2]);
-obstaculo:
-  notificar("indice invalido capturado");
-fin_ruta
+  anotar(l[2]);
+imprevisto:
+  anotar("indice invalido capturado");
+fin_sendero
 
-intentar_ruta:
-  notificar(desconocida);
-obstaculo m:
-  notificar("capturado: " + m);
-fin_ruta
+explorar:
+  anotar(desconocida);
+imprevisto m:
+  anotar("capturado: " + m);
+fin_sendero
 
-intentar_ruta:
-  notificar("solo con destino");
-destino:
-  notificar("destino sin obstaculo");
-fin_ruta
+explorar:
+  anotar("solo con destino");
+recoger:
+  anotar("destino sin obstaculo");
+fin_sendero
 
 recorrer i partiendo_de 1 llegando_a 4:
-  intentar_ruta:
+  explorar:
     evaluar i == 2:
       avanzar;
-    fin_ruta
+    fin_sendero
     evaluar i == 4:
       detener;
-    fin_ruta
-    notificar("i = " + i);
-  destino:
-    notificar("destino i = " + i);
-  fin_ruta
-fin_ruta
+    fin_sendero
+    anotar("i = " + i);
+  recoger:
+    anotar("destino i = " + i);
+  fin_sendero
+fin_sendero
 
-tarea con_return():
-  intentar_ruta:
-    entregar "desde try";
-  destino:
-    notificar("destino antes de retornar");
-  fin_ruta
-fin_ruta
-notificar(con_return());
+trayecto con_return():
+  explorar:
+    regresar "desde try";
+  recoger:
+    anotar("destino antes de retornar");
+  fin_sendero
+fin_sendero
+anotar(con_return());
 
-intentar_ruta:
-  alerta [1, 2, 3];
-obstaculo q:
-  notificar(q);
-fin_ruta
+explorar:
+  tormenta [1, 2, 3];
+imprevisto q:
+  anotar(q);
+fin_sendero

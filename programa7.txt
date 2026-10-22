@@ -1,26 +1,26 @@
 # Programa 7: Errores de ejecucion capturados y recursion
-cargar paquetes en [10, 20, 30];
+cargar kilometros en [10, 20, 30];
 cargar total en 0;
 
-intentar_ruta:
-    notificar(100 / total);
-obstaculo e:
-    notificar("Capturado: " + e);
-destino:
-    notificar("Primera verificacion terminada");
-fin_ruta
+explorar:
+    anotar(100 / total);
+imprevisto e:
+    anotar("Capturado: " + e);
+recoger:
+    anotar("Primera verificacion terminada");
+fin_sendero
 
-intentar_ruta:
-    notificar(paquetes[5]);
-obstaculo e:
-    notificar("Capturado: " + e);
-fin_ruta
+explorar:
+    anotar(kilometros[5]);
+imprevisto e:
+    anotar("Capturado: " + e);
+fin_sendero
 
-tarea factorial(n):
+trayecto factorial(n):
     evaluar n <= 1:
-        entregar 1;
-    fin_ruta
-    entregar n * factorial(n - 1);
-fin_ruta
+        regresar 1;
+    fin_sendero
+    regresar n * factorial(n - 1);
+fin_sendero
 
-notificar("Factorial de 5: " + factorial(5));
+anotar("Factorial de 5: " + factorial(5));

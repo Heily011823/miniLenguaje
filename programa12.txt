@@ -1,52 +1,52 @@
 # Programa 12: Modulos (clases): atributos, constructor, metodos, herencia y superior
-modulo Cuenta:
+campamento Cuenta:
   cargar moneda en "COP";
-  ensamblar(titular, saldo):
+  armar(titular, saldo):
     mismo.titular en titular;
     mismo.saldo en saldo;
-  fin_ruta
-  tarea depositar(v):
+  fin_sendero
+  trayecto depositar(v):
     mismo.saldo en mismo.saldo + v;
-    entregar mismo.consultar();
-  fin_ruta
-  tarea consultar():
-    entregar mismo.saldo;
-  fin_ruta
-  tarea describir():
-    entregar mismo.titular + " tiene " + mismo.saldo + " " + mismo.moneda;
-  fin_ruta
-fin_ruta
+    regresar mismo.consultar();
+  fin_sendero
+  trayecto consultar():
+    regresar mismo.saldo;
+  fin_sendero
+  trayecto describir():
+    regresar mismo.titular + " tiene " + mismo.saldo + " " + mismo.moneda;
+  fin_sendero
+fin_sendero
 
-modulo CuentaPremium extiende Cuenta:
-  ensamblar(titular, saldo, bono):
-    superior.ensamblar(titular, saldo);
+campamento CuentaPremium extiende Cuenta:
+  armar(titular, saldo, bono):
+    superior.armar(titular, saldo);
     mismo.bono en bono;
-  fin_ruta
-  tarea describir():
-    entregar superior.describir() + " (premium, bono " + mismo.bono + ")";
-  fin_ruta
-fin_ruta
+  fin_sendero
+  trayecto describir():
+    regresar superior.describir() + " (premium, bono " + mismo.bono + ")";
+  fin_sendero
+fin_sendero
 
-modulo Sencillo:
-  tarea saludar():
-    entregar "hola";
-  fin_ruta
-fin_ruta
+campamento Sencillo:
+  trayecto saludar():
+    regresar "hola";
+  fin_sendero
+fin_sendero
 
-cargar c en desplegar Cuenta("Ana", 100);
-notificar(c.depositar(50));
-notificar(c.describir());
+cargar c en montar Cuenta("Ana", 100);
+anotar(c.depositar(50));
+anotar(c.describir());
 c.saldo en 500;
-notificar(c.saldo);
+anotar(c.saldo);
 
-cargar p en desplegar CuentaPremium("Luis", 10, 5);
-notificar(p.depositar(1));
-notificar(p.describir());
+cargar p en montar CuentaPremium("Luis", 10, 5);
+anotar(p.depositar(1));
+anotar(p.describir());
 
-cargar s en desplegar Sencillo();
-notificar(s.saludar());
+cargar s en montar Sencillo();
+anotar(s.saludar());
 
-cargar cuentas en [desplegar Cuenta("A", 1), desplegar Cuenta("B", 2)];
+cargar cuentas en [montar Cuenta("A", 1), montar Cuenta("B", 2)];
 recorrer i partiendo_de 0 llegando_a 1:
-  notificar(cuentas[i].describir());
-fin_ruta
+  anotar(cuentas[i].describir());
+fin_sendero
