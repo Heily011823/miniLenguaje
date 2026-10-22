@@ -19,4 +19,5 @@ env/
 *.log
 
 respaldo_robot/
-cambiar_tema/
+cambiar_tema.py
+probar_programas.py
