@@ -1,26 +1,26 @@
-# Programa 3: Modulo de Bateria y Excepciones
-modulo RobotEntrega:
-    ensamblar(id_robot, bateria_actual):
-        mismo.id_robot en id_robot;
-        mismo.bateria_actual en bateria_actual;
-    fin_ruta
+# Programa 3: Campamento de Provisiones y Excepciones
+campamento Excursionista:
+    armar(nombre, agua_actual):
+        mismo.nombre en nombre;
+        mismo.agua_actual en agua_actual;
+    fin_sendero
 
-    tarea consumir_bateria(costo):
-        evaluar costo > mismo.bateria_actual:
-            alerta "Bateria insuficiente para completar el trayecto";
-        fin_ruta
-        mismo.bateria_actual en mismo.bateria_actual - costo;
-        entregar mismo.bateria_actual;
-    fin_ruta
-fin_ruta
+    trayecto beber_agua(cantidad):
+        evaluar cantidad > mismo.agua_actual:
+            tormenta "Agua insuficiente para completar el sendero";
+        fin_sendero
+        mismo.agua_actual en mismo.agua_actual - cantidad;
+        regresar mismo.agua_actual;
+    fin_sendero
+fin_sendero
 
-cargar bot en desplegar RobotEntrega("RutaBot-01", 100);
+cargar guia en montar Excursionista("Guia-01", 100);
 
-intentar_ruta:
-    notificar("Bateria restante: " + bot.consumir_bateria(30));
-    notificar("Bateria restante: " + bot.consumir_bateria(200));
-obstaculo err:
-    notificar("Alerta de Ruta: " + err);
-destino:
-    notificar("Monitoreo de telemetria finalizado");
-fin_ruta
+explorar:
+    anotar("Agua restante: " + guia.beber_agua(30));
+    anotar("Agua restante: " + guia.beber_agua(200));
+imprevisto err:
+    anotar("Imprevisto en el sendero: " + err);
+recoger:
+    anotar("Revision del equipo finalizada");
+fin_sendero

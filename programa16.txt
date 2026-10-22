@@ -8,15 +8,15 @@ consultar("INSERT INTO entregas (destino, minutos) VALUES (?, ?)", ["Laboratorio
 
 cargar filas en consultar("SELECT destino, minutos FROM entregas ORDER BY minutos");
 recorrer i partiendo_de 0 llegando_a longitud(filas) - 1:
-  notificar(filas[i][0] + " -> " + filas[i][1] + " min");
-fin_ruta
+  anotar(filas[i][0] + " -> " + filas[i][1] + " min");
+fin_sendero
 
 cargar total en consultar("SELECT SUM(minutos) FROM entregas");
-notificar("Total: " + total[0][0]);
+anotar("Total: " + total[0][0]);
 
-intentar_ruta:
+explorar:
   consultar("SELECT * FROM tabla_que_no_existe");
-obstaculo e:
-  notificar("Capturado: " + e);
-fin_ruta
+imprevisto e:
+  anotar("Capturado: " + e);
+fin_sendero
 desenlazar();
