@@ -62,32 +62,32 @@ ESPECIFICACION = [
 
 PATRON = re.compile("|".join("(?P<%s>%s)" % par for par in ESPECIFICACION))
 
-""" 
-    Representa un token reconocido durante el análisis léxico.
+
+@dataclass
+class Token:
+
+    """ Representa un token reconocido durante el análisis léxico.
 
     Atributos:
         tipo: categoría a la que pertenece el token.
         lexema: texto exacto encontrado en el programa.
         linea: número de línea donde aparece.
-"""
-@dataclass
-class Token:
+    """
     tipo: str
     lexema: str
     linea: int
 
-    """
-        Devuelve una representación del token como texto.
-
+    def __str__(self):
+        """Devuelve una representación del token como texto.
+        
         Retorna:
             Una cadena con el número de línea, el tipo y el lexema.
-    """
-    def __str__(self):
+        """
         return "[line %d] %s %s" % (self.linea, self.tipo, self.lexema)
 
 
-"""
-    Analiza el código fuente y reconoce sus tokens.
+def analizar(codigo):
+    """ Analiza el código fuente y reconoce sus tokens.
 
     Parámetros:
         codigo: texto del programa escrito.
@@ -97,9 +97,7 @@ class Token:
         - tokens: lista de tokens encontrados, incluyendo el token EOF.
         - errores: lista de tuplas con el número de línea y el mensaje
           de cada error léxico detectado.
-"""
-def analizar(codigo):
-    """Devuelve (tokens, errores). errores es una lista de (linea, mensaje)."""
+    """
     tokens, errores = [], []
     linea = 1
     for m in PATRON.finditer(codigo):

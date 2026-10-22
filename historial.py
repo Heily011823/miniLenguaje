@@ -8,15 +8,16 @@ from datetime import datetime
 # Guarda la ruta de la base de datos en la misma carpeta de este archivo.
 RUTA_BD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "historial_ruta.db")
 
-""" Abre la conexión con la base de datos y crea la tabla si no existe.
+
+def _conectar(ruta=None):
+    """ Abre la conexión con la base de datos y crea la tabla si no existe.
 
     Parámetros:
         ruta: ruta opcional de la base de datos. Si no se indica, se utiliza la ruta guardada en RUTA_BD.
 
     Retorna:
         La conexión con la base de datos.
-"""
-def _conectar(ruta=None):
+    """
     con = sqlite3.connect(ruta or RUTA_BD)
     con.execute("""CREATE TABLE IF NOT EXISTS ejecuciones (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,8 +29,8 @@ def _conectar(ruta=None):
     return con
 
 
-
-""" Guarda los datos de una ejecución en la base de datos.
+def guardar(archivo, codigo, salida, estado, ruta=None):
+    """ Guarda los datos de una ejecución en la base de datos.
 
     Parámetros:
         archivo: nombre o ruta del archivo ejecutado.
@@ -41,9 +42,7 @@ def _conectar(ruta=None):
     Retorna:
         True si los datos se guardaron correctamente.
         False si ocurre un error de SQLite o del sistema de archivos.
-"""
-def guardar(archivo, codigo, salida, estado, ruta=None):
-    """Guarda una ejecución. Nunca lanza errores: el historial no debe romper el intérprete."""
+    """
     try:
         con = _conectar(ruta)
         # Inserta los datos de la ejecución en la tabla.
@@ -60,7 +59,8 @@ def guardar(archivo, codigo, salida, estado, ruta=None):
 
 
 
-""" Consulta las ejecuciones guardadas en la base de datos.
+def listar(limite=20, ruta=None):
+    """ Consulta las ejecuciones guardadas en la base de datos.
 
     Parámetros:
         limite: cantidad máxima de registros que se quieren consultar. Por defecto, devuelve hasta 20 ejecuciones.
@@ -70,8 +70,7 @@ def guardar(archivo, codigo, salida, estado, ruta=None):
         Una lista con los registros ordenados del más reciente
         al más antiguo. Cada registro contiene su identificador,
         fecha, archivo, estado, código y salida.
-"""
-def listar(limite=20, ruta=None):
+    """
     con = _conectar(ruta)
 
     # Organiza los registros desde el más reciente hasta el más antiguo.
@@ -81,8 +80,8 @@ def listar(limite=20, ruta=None):
     return filas
 
 
-
-""" Busca una ejecución específica mediante su identificador.
+def obtener(id_, ruta=None):
+    """ Busca una ejecución específica mediante su identificador.
 
     Parámetros:
         id_: identificador de la ejecución que se quiere consultar.
@@ -91,9 +90,7 @@ def listar(limite=20, ruta=None):
     Retorna:
         Una tupla con los datos de la ejecución si existe.
         Devuelve None si no se encuentra ningún registro con ese ID.
-"""
-# Busca una ejecución específica usando su identificador.
-def obtener(id_, ruta=None):
+    """
     con = _conectar(ruta)
 
     # Consulta todos los datos del registro seleccionado.
