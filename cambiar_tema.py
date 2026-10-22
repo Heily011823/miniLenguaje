@@ -13,16 +13,28 @@ Que hace:
      comentarios. Los programas 1 a 8 se reescriben con los textos del informe.
   4. Avisa de lo que debes revisar a mano.
 """
+# Permite leer el código como un flujo de texto.
 import io
+
+# Permite gestionar archivos y directorios.
 import os
+
+# Permite buscar palabras mediante patrones.
 import re
+
+# Permite copiar archivos para el respaldo.
 import shutil
+
+# Permite finalizar el programa con un código de salida.
 import sys
+
+# Identifica cadenas y comentarios del código Python.
 import tokenize
 
 # ----------------------------------------------------------------------------
 # Vocabulario: palabra vieja -> palabra nueva
 # ----------------------------------------------------------------------------
+# Relaciona las palabras del tema Robot con las del tema Senderismo.
 MAP = {
     "notificar": "anotar",
     "escanear": "preguntar",
@@ -46,11 +58,13 @@ MAP = {
     "alerta": "tormenta",
     "fin_ruta": "fin_sendero",
 }
+
+# Almacena las nuevas palabras reservadas para detectar conflictos.
 NUEVAS = {"anotar", "preguntar", "caminar", "ascender", "mirador", "sendero_base",
           "trayecto", "regresar", "campamento", "armar", "montar", "explorar",
           "imprevisto", "recoger", "tormenta", "fin_sendero"}
 
-# Frases con genero/articulo que hay que ajustar (se aplican ANTES que MAP)
+# Contiene frases completas que requieren cambios gramaticales.
 FRASES = [
     ("la tarea '%s' no está definida", "el trayecto '%s' no está definido"),
     ("tarea '%s' no definida", "trayecto '%s' no definido"),
@@ -65,13 +79,14 @@ FRASES = [
     ("El robot ha llegado al destino", "La excursion ha llegado a la cumbre"),
 ]
 
+# Busca las palabras que aparecen en el diccionario.
 PAT = re.compile(r"(?<![\w])(" + "|".join(sorted(map(re.escape, MAP), key=len, reverse=True)) + r")(?![\w])")
 
-
+# Busca las palabras del diccionario y las cambia por las nuevas.
 def mapear(texto):
     return PAT.sub(lambda m: MAP[m.group(1)], texto)
 
-
+# Cambia las frases que necesitan ajustes y después las palabras.
 def transformar_texto(texto):
     for viejo, nuevo in FRASES:
         texto = texto.replace(viejo, nuevo)
@@ -81,6 +96,8 @@ def transformar_texto(texto):
 # ----------------------------------------------------------------------------
 # Archivos .py: solo cadenas y comentarios
 # ----------------------------------------------------------------------------
+
+# Recorre el código Python y cambia solo los textos entre comillas y los comentarios, sin modificar los nombres del código.
 def convertir_py(src):
     lineas = src.split("\n")
     inicios, pos = [], 0
@@ -108,19 +125,19 @@ def convertir_py(src):
 # ----------------------------------------------------------------------------
 CADENA_O_COMENTARIO = re.compile(r'("(?:[^"\\\n]|\\.)*"?|#.*)')
 
-
+# Cambia las palabras reservadas de los programas TXT, dejando sin modificar las cadenas y los comentarios.
 def convertir_txt(src):
     partes = CADENA_O_COMENTARIO.split(src)
     return "".join(p if i % 2 else mapear(p) for i, p in enumerate(partes))
 
-
+# Revisa si alguna palabra nueva ya se utiliza como identificador.
 def identificadores_nuevos(src):
     """Palabras nuevas que el programa YA usaba como nombre de variable."""
     partes = CADENA_O_COMENTARIO.split(src)
     codigo = " ".join(p for i, p in enumerate(partes) if i % 2 == 0)
     return sorted(set(re.findall(r"[^\W\d]\w*", codigo)) & NUEVAS)
 
-
+# Guarda el contenido de los programas del 1 al 8 adaptados al tema del Senderismo.
 PROGRAMAS = {
 1: '''# Programa 1: Evaluacion de distancia del sendero
 cargar distancia en 20;
@@ -255,29 +272,39 @@ anotar("Esto no se imprime");
 ''',
 }
 
+# Busca palabras del tema anterior que podrían necesitar cambios.
 REVISAR = re.compile(r"robot|entrega|bateria|batería|paquete|biblioteca|campus|pasillo|ruta", re.I)
 
 
 def main():
+    # Obtiene la carpeta actual y el nombre del archivo.
     carpeta = os.getcwd()
     yo = os.path.basename(__file__)
+
+    # Comprueba que exista lexer.py antes de continuar.
     if not os.path.exists(os.path.join(carpeta, "lexer.py")):
         print("No encuentro lexer.py. Ejecuta este script DENTRO de la carpeta miniLenguaje.")
         return 1
+    
+    # Evita repetir la conversión si encuentra la palabra nueva en lexer.py.
     with open(os.path.join(carpeta, "lexer.py"), encoding="utf-8-sig") as f:
         if '"anotar"' in f.read():
             print("El proyecto ya parece estar convertido (lexer.py ya tiene 'anotar'). No hago nada.")
             return 0
 
+    # Busca los archivos Python y los programas TXT que se van a procesar.
     py = sorted(f for f in os.listdir(carpeta) if f.endswith(".py") and f not in (yo, "probar_programas.py"))
     txt = sorted(f for f in os.listdir(carpeta) if re.fullmatch(r"programa\d+\.txt", f))
 
-    # ---- 1. copia de seguridad ----
+     # Crea una copia de seguridad si todavía no existe.
     respaldo = os.path.join(carpeta, "respaldo_robot")
+
+    # Si ya existe la copia, la deja como está para no perder los originales.
     if os.path.exists(respaldo):
         print("Ya existe 'respaldo_robot/'. No la sobrescribo (guarda la copia original).")
     else:
         os.makedirs(respaldo)
+        # Copia los archivos antes de hacerles cambios.
         for nombre in py + txt:
             shutil.copy2(os.path.join(carpeta, nombre), os.path.join(respaldo, nombre))
         print("Copia de seguridad creada en 'respaldo_robot/' (%d archivos)." % (len(py) + len(txt)))
@@ -285,41 +312,59 @@ def main():
     avisos = []
 
     # ---- 2. archivos .py ----
+    # Procesa los archivos Python y guarda los cambios.
     print("\n== Archivos .py ==")
     for nombre in py:
         ruta = os.path.join(carpeta, nombre)
+
+        # Lee el contenido del archivo.
         with open(ruta, encoding="utf-8-sig", newline="") as f:
             src = f.read()
         nuevo, n = convertir_py(src)
+
+        # Guarda el contenido actualizado.
         with open(ruta, "w", encoding="utf-8", newline="") as f:
             f.write(nuevo)
         print("  %-16s %d textos cambiados" % (nombre, n))
 
     # ---- 3. programas .txt ----
+    # Procesa los programas TXT y revisa posibles conflictos.
     print("\n== Programas .txt ==")
     for nombre in txt:
         num = int(re.search(r"\d+", nombre).group())
         ruta = os.path.join(carpeta, nombre)
+
+        # Lee el contenido original del programa.
         with open(ruta, encoding="utf-8-sig", newline="") as f:
             original = f.read()
+
+        # Comprueba si alguna palabra nueva ya se usa como variable.
         usados = identificadores_nuevos(original)
         if usados:
             avisos.append("%s usa como NOMBRE DE VARIABLE palabras que ahora son reservadas: %s "
                           "(renombralas)" % (nombre, ", ".join(usados)))
+        
+        # Usa la versión preparada para los programas del 1 al 8.
         if num in PROGRAMAS:
             nuevo = PROGRAMAS[num]
             accion = "reescrito con el texto del informe"
         else:
+            # Convierte las palabras de los demás programas.
             nuevo = convertir_txt(original)
             accion = "palabras reservadas convertidas"
+
+            # Busca palabras que puedan necesitar cambios manuales.
             for i, ln in enumerate(nuevo.split("\n"), 1):
                 if REVISAR.search(ln):
                     avisos.append("%s linea %d: %s" % (nombre, i, ln.strip()))
+        
+        # Guarda el programa actualizado.
         with open(ruta, "w", encoding="utf-8", newline="") as f:
             f.write(nuevo)
         print("  %-16s %s" % (nombre, accion))
 
     # ---- 4. avisos ----
+    # Muestra los avisos encontrados durante la revisión.
     print("\n== Revisa a mano ==")
     if avisos:
         for a in avisos:
@@ -329,6 +374,6 @@ def main():
     print("\nListo. Ahora ejecuta:  python probar_programas.py")
     return 0
 
-
+# Ejecuta la función principal al iniciar el archivo directamente.
 if __name__ == "__main__":
     sys.exit(main())
