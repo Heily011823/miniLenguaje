@@ -14,10 +14,10 @@ EJEMPLO = """# Programa de ejemplo
 cargar distancia en 20;
 
 evaluar distancia > 5:
-  notificar("La entrega esta lejos de la biblioteca");
+  anotar("El mirador esta lejos del campamento");
 alternativa:
-  notificar("El robot ha llegado al destino");
-fin_ruta
+  anotar("La excursion ha llegado a la cumbre");
+fin_sendero
 """
 
 COLOR_FONDO = "#1e1e2e"
@@ -170,7 +170,7 @@ class App:
 
     # ------------------------------------------------------ ejecución
     def pedir_entrada(self):
-        dato = simpledialog.askstring("escanear", "El programa pide un dato:", parent=self.raiz)
+        dato = simpledialog.askstring("preguntar", "El programa pide un dato:", parent=self.raiz)
         if dato is None:
             raise EOFError
         self.escribir(self.p_salida, "> " + dato)
