@@ -54,6 +54,15 @@ DEBEN_FALLAR = {5, 6, 8, 15}
 
 
 def correr(num):
+    """ Ejecuta un programa de prueba y recoge su código de salida y los mensajes.
+
+    Parámetros:
+        num: número del programa que se va a ejecutar.
+
+    Retorna:
+        Una tupla con el código de salida del proceso y el texto combinado
+        de la salida estándar y la salida de errores.
+    """
     env = dict(os.environ, PYTHONIOENCODING="utf-8")
     p = subprocess.run([sys.executable, "main.py", "programa%d.txt" % num, "--sin-tokens"],
                        input=ENTRADA.get(num, ""), capture_output=True, text=True,
@@ -62,7 +71,17 @@ def correr(num):
 
 
 def revisar(num, codigo, salida):
-    """Devuelve (ok, detalle)."""
+    """ Comprueba si el resultado del programa es el esperado.
+
+    Parámetros:
+        num: número del programa de prueba.
+        codigo: código de salida del proceso que fue ejecutado.
+        salida: texto producido por el programa.
+
+    Retorna:
+        Una tupla (ok, detalle), donde ok indica si la prueba pasó
+        y detalle contiene la descripción del problema si falló.
+    """
     if num in DEBEN_FALLAR:
         if codigo == 0:
             return False, "debia terminar con error y termino bien"
@@ -82,6 +101,17 @@ def revisar(num, codigo, salida):
 
 
 def main(argv):
+    """ Ejecuta las pruebas o comprueba todos los programas.
+
+    Parámetros:
+        argv: lista de argumentos recibidos desde la línea de comandos.
+              Si contiene números, ejecuta esos programas y muestra sus salidas.
+              Si está vacía, comprueba los 17 programas y presenta un resumen.
+
+    Retorna:
+        0 si todas las pruebas son correctas.
+        1 si se detectan fallos o falta el archivo principal.
+    """
     if not os.path.exists("main.py"):
         print("Ejecuta este script DENTRO de la carpeta miniLenguaje.")
         return 1
@@ -110,5 +140,6 @@ def main(argv):
     return 0 if not fallos else 1
 
 
+# Comprueba si el archivo se está ejecutando directamente.
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
